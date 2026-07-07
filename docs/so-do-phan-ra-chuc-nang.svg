@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1200" viewBox="0 0 1800 1200">
+  <defs>
+    <style>
+      .title { font: 700 34px Arial, sans-serif; fill: #1f2937; }
+      .boxTitle { font: 700 24px Arial, sans-serif; fill: #111827; }
+      .item { font: 500 18px Arial, sans-serif; fill: #374151; }
+      .line { stroke: #6b7280; stroke-width: 3; fill: none; }
+      .root { fill: #84cc16; stroke: #65a30d; stroke-width: 4; }
+      .moduleA { fill: #dbeafe; stroke: #60a5fa; stroke-width: 3; }
+      .moduleB { fill: #dcfce7; stroke: #4ade80; stroke-width: 3; }
+      .moduleC { fill: #fef3c7; stroke: #f59e0b; stroke-width: 3; }
+      .moduleD { fill: #fee2e2; stroke: #f87171; stroke-width: 3; }
+      .moduleE { fill: #ede9fe; stroke: #a78bfa; stroke-width: 3; }
+      .moduleF { fill: #fce7f3; stroke: #f472b6; stroke-width: 3; }
+    </style>
+  </defs>
+
+  <text x="900" y="60" text-anchor="middle" class="title">SO DO PHAN RA CHUC NANG HE THONG LAPTOPSHOP</text>
+
+  <rect x="650" y="110" rx="22" ry="22" width="500" height="90" class="root" />
+  <text x="900" y="165" text-anchor="middle" class="boxTitle">HE THONG LAPTOPSHOP</text>
+
+  <path d="M900 200 L900 250" class="line" />
+  <path d="M250 250 L1550 250" class="line" />
+  <path d="M250 250 L250 290" class="line" />
+  <path d="M680 250 L680 290" class="line" />
+  <path d="M1120 250 L1120 290" class="line" />
+  <path d="M1550 250 L1550 290" class="line" />
+
+  <rect x="70" y="290" rx="20" ry="20" width="360" height="310" class="moduleA" />
+  <text x="250" y="335" text-anchor="middle" class="boxTitle">1. QUAN LY NGUOI DUNG</text>
+  <text x="105" y="390" class="item">1.1 Dang nhap / Dang xuat</text>
+  <text x="105" y="435" class="item">1.2 Dang ky tai khoan</text>
+  <text x="105" y="480" class="item">1.3 Quan ly ho so ca nhan</text>
+  <text x="105" y="525" class="item">1.4 Phan quyen Admin / User</text>
+
+  <rect x="500" y="290" rx="20" ry="20" width="360" height="310" class="moduleB" />
+  <text x="680" y="335" text-anchor="middle" class="boxTitle">2. QUAN LY SAN PHAM</text>
+  <text x="535" y="390" class="item">2.1 Xem danh sach san pham</text>
+  <text x="535" y="435" class="item">2.2 Xem chi tiet san pham</text>
+  <text x="535" y="480" class="item">2.3 Tim kiem va loc san pham</text>
+  <text x="535" y="525" class="item">2.4 Hien thi ton kho</text>
+  <text x="535" y="570" class="item">2.5 Them / Sua / Xoa san pham</text>
+
+  <rect x="940" y="290" rx="20" ry="20" width="360" height="310" class="moduleC" />
+  <text x="1120" y="335" text-anchor="middle" class="boxTitle">3. QUAN LY GIO HANG</text>
+  <text x="975" y="390" class="item">3.1 Them san pham vao gio</text>
+  <text x="975" y="435" class="item">3.2 Cap nhat so luong</text>
+  <text x="975" y="480" class="item">3.3 Xoa san pham khoi gio</text>
+  <text x="975" y="525" class="item">3.4 Xem va xac nhan gio hang</text>
+
+  <rect x="1370" y="290" rx="20" ry="20" width="360" height="310" class="moduleD" />
+  <text x="1550" y="335" text-anchor="middle" class="boxTitle">4. QUAN LY DON HANG</text>
+  <text x="1405" y="390" class="item">4.1 Checkout va tao don hang</text>
+  <text x="1405" y="435" class="item">4.2 Luu chi tiet don hang</text>
+  <text x="1405" y="480" class="item">4.3 Tru ton kho sau khi mua</text>
+  <text x="1405" y="525" class="item">4.4 Xem lich su mua hang</text>
+  <text x="1405" y="570" class="item">4.5 Loc don theo thoi gian</text>
+
+  <path d="M680 600 L680 680" class="line" />
+  <path d="M680 680 L1120 680" class="line" />
+  <path d="M1120 600 L1120 680" class="line" />
+  <path d="M680 680 L680 720" class="line" />
+  <path d="M1120 680 L1120 720" class="line" />
+
+  <rect x="500" y="720" rx="20" ry="20" width="360" height="280" class="moduleE" />
+  <text x="680" y="765" text-anchor="middle" class="boxTitle">5. QUAN TRI ADMIN</text>
+  <text x="535" y="820" class="item">5.1 Quan ly user</text>
+  <text x="535" y="865" class="item">5.2 Quan ly product</text>
+  <text x="535" y="910" class="item">5.3 Quan ly order</text>
+  <text x="535" y="955" class="item">5.4 Dashboard tong quan</text>
+
+  <rect x="940" y="720" rx="20" ry="20" width="360" height="280" class="moduleF" />
+  <text x="1120" y="765" text-anchor="middle" class="boxTitle">6. THONG KE</text>
+  <text x="975" y="820" class="item">6.1 Thong ke theo ngay</text>
+  <text x="975" y="865" class="item">6.2 Thong ke theo thang</text>
+  <text x="975" y="910" class="item">6.3 Thong ke theo nam</text>
+  <text x="975" y="955" class="item">6.4 Bieu do doanh thu / ton kho</text>
+</svg>

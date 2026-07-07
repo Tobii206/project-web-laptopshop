@@ -1,0 +1,74 @@
+<mxfile host="app.diagrams.net" modified="2026-05-14T00:00:00.000Z" agent="Codex" version="24.7.17">
+  <diagram id="simple-function-diagram" name="So do chuc nang LaptopShop">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Sơ đồ chức năng hệ thống LaptopShop" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=24;fontStyle=1;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="500" y="30" width="500" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="customer" value="Khách hàng" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=18;fontColor=#ffffff;strokeColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="120" y="340" width="80" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="admin" value="Quản trị viên" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=18;fontColor=#ffffff;strokeColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="320" width="80" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="box1" value="Đăng ký / Đăng nhập&#xa;Thông tin tài khoản" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;fontColor=#ffffff;strokeColor=#ffffff;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="420" y="120" width="260" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="box2" value="Tìm kiếm / Lọc sản phẩm&#xa;Xem chi tiết sản phẩm" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;fontColor=#ffffff;strokeColor=#ffffff;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="420" y="300" width="260" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="box3" value="Quản lý giỏ hàng&#xa;Đặt hàng trực tuyến&#xa;Theo dõi đơn hàng" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;fontColor=#ffffff;strokeColor=#ffffff;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="420" y="480" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="box4" value="Đánh giá sản phẩm&#xa;Lịch sử mua hàng" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;fontColor=#ffffff;strokeColor=#ffffff;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="420" y="680" width="260" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="box5" value="Quản lý sản phẩm&#xa;Quản lý tồn kho" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;fontColor=#ffffff;strokeColor=#ffffff;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="860" y="120" width="280" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="box6" value="Quản lý người dùng&#xa;Quản lý tài khoản admin" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;fontColor=#ffffff;strokeColor=#ffffff;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="860" y="300" width="280" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="box7" value="Quản lý đơn hàng&#xa;Cập nhật trạng thái đơn hàng&#xa;Xem chi tiết đơn hàng" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;fontColor=#ffffff;strokeColor=#ffffff;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="860" y="480" width="280" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="box8" value="Thống kê&#xa;Báo cáo doanh thu" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;fontColor=#ffffff;strokeColor=#ffffff;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="860" y="680" width="280" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" style="endArrow=block;endFill=1;strokeColor=#ffffff;fontColor=#ffffff;html=1;" edge="1" parent="1" source="customer" target="box1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" style="endArrow=block;endFill=1;strokeColor=#ffffff;fontColor=#ffffff;html=1;" edge="1" parent="1" source="customer" target="box2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" style="endArrow=block;endFill=1;strokeColor=#ffffff;fontColor=#ffffff;html=1;" edge="1" parent="1" source="customer" target="box3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" style="endArrow=block;endFill=1;strokeColor=#ffffff;fontColor=#ffffff;html=1;" edge="1" parent="1" source="customer" target="box4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e5" style="endArrow=block;endFill=1;strokeColor=#ffffff;fontColor=#ffffff;html=1;" edge="1" parent="1" source="admin" target="box5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" style="endArrow=block;endFill=1;strokeColor=#ffffff;fontColor=#ffffff;html=1;" edge="1" parent="1" source="admin" target="box6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" style="endArrow=block;endFill=1;strokeColor=#ffffff;fontColor=#ffffff;html=1;" edge="1" parent="1" source="admin" target="box7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" style="endArrow=block;endFill=1;strokeColor=#ffffff;fontColor=#ffffff;html=1;" edge="1" parent="1" source="admin" target="box8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

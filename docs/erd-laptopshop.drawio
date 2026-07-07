@@ -1,0 +1,70 @@
+<mxfile host="app.diagrams.net" modified="2026-05-14T00:00:00.000Z" agent="Codex" version="24.7.17">
+  <diagram id="erd-laptopshop" name="ERD LaptopShop">
+    <mxGraphModel dx="1800" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="roles" value="roles&#xa;----------------&#xa;PK id&#xa;name&#xa;description" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=stackLayout;horizontal=1;resizeLast=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;fontStyle=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="80" width="220" height="170" as="geometry" />
+        </mxCell>
+
+        <mxCell id="users" value="users&#xa;----------------&#xa;PK id&#xa;email&#xa;password&#xa;full_name&#xa;address&#xa;phone&#xa;avatar&#xa;FK role_id" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=stackLayout;horizontal=1;resizeLast=0;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=16;fontStyle=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="60" width="240" height="250" as="geometry" />
+        </mxCell>
+
+        <mxCell id="carts" value="carts&#xa;----------------&#xa;PK id&#xa;quantity&#xa;FK user_id" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=stackLayout;horizontal=1;resizeLast=0;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=16;fontStyle=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="680" y="60" width="220" height="170" as="geometry" />
+        </mxCell>
+
+        <mxCell id="products" value="products&#xa;----------------&#xa;PK id&#xa;name&#xa;price&#xa;quantity&#xa;image&#xa;detail_desc&#xa;short_desc&#xa;sold&#xa;factory&#xa;target" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=stackLayout;horizontal=1;resizeLast=0;fillColor=#f8cecc;strokeColor=#b85450;fontSize=16;fontStyle=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="960" y="40" width="250" height="290" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cart_detail" value="cart_detail&#xa;----------------&#xa;PK id&#xa;quantity&#xa;price&#xa;FK cart_id&#xa;FK product_id" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=stackLayout;horizontal=1;resizeLast=0;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=16;fontStyle=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="680" y="300" width="240" height="190" as="geometry" />
+        </mxCell>
+
+        <mxCell id="orders" value="orders&#xa;----------------&#xa;PK id&#xa;total_price&#xa;receiver_name&#xa;receiver_phone&#xa;receiver_address&#xa;status&#xa;created_at&#xa;FK user_id" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=stackLayout;horizontal=1;resizeLast=0;fillColor=#d4e1f5;strokeColor=#6c8ebf;fontSize=16;fontStyle=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="420" width="260" height="250" as="geometry" />
+        </mxCell>
+
+        <mxCell id="order_detail" value="order_detail&#xa;----------------&#xa;PK id&#xa;quantity&#xa;price&#xa;FK order_id&#xa;FK product_id" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=stackLayout;horizontal=1;resizeLast=0;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=16;fontStyle=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="560" width="240" height="190" as="geometry" />
+        </mxCell>
+
+        <mxCell id="reviews" value="reviews&#xa;----------------&#xa;PK id&#xa;rating&#xa;comment&#xa;created_at&#xa;FK product_id&#xa;FK user_id" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=stackLayout;horizontal=1;resizeLast=0;fillColor=#f5f5f5;strokeColor=#666666;fontSize=16;fontStyle=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="430" width="240" height="190" as="geometry" />
+        </mxCell>
+
+        <mxCell id="rel1" value="1 - n" style="endArrow=block;endFill=1;html=1;strokeWidth=2;fontSize=14;" edge="1" parent="1" source="roles" target="users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel2" value="1 - 1" style="endArrow=block;endFill=1;html=1;strokeWidth=2;fontSize=14;" edge="1" parent="1" source="users" target="carts">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel3" value="1 - n" style="endArrow=block;endFill=1;html=1;strokeWidth=2;fontSize=14;" edge="1" parent="1" source="carts" target="cart_detail">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel4" value="1 - n" style="endArrow=block;endFill=1;html=1;strokeWidth=2;fontSize=14;" edge="1" parent="1" source="products" target="cart_detail">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel5" value="1 - n" style="endArrow=block;endFill=1;html=1;strokeWidth=2;fontSize=14;" edge="1" parent="1" source="users" target="orders">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel6" value="1 - n" style="endArrow=block;endFill=1;html=1;strokeWidth=2;fontSize=14;" edge="1" parent="1" source="orders" target="order_detail">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel7" value="1 - n" style="endArrow=block;endFill=1;html=1;strokeWidth=2;fontSize=14;" edge="1" parent="1" source="products" target="order_detail">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel8" value="1 - n" style="endArrow=block;endFill=1;html=1;strokeWidth=2;fontSize=14;" edge="1" parent="1" source="users" target="reviews">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel9" value="1 - n" style="endArrow=block;endFill=1;html=1;strokeWidth=2;fontSize=14;" edge="1" parent="1" source="products" target="reviews">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
