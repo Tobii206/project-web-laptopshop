@@ -58,8 +58,6 @@ Metadata Maven:
 
 ## Anh giao dien
 
-> Cap nhat cac anh trong thu muc `docs/screenshots` khi giao dien thay doi de README luon hien thi dung ban moi nhat.
-
 ### Dang nhap
 
 <p align="center">
