@@ -1,45 +1,210 @@
-# Online Shopping Website
+# LaptopShop
 
-## Technologies Used
-- **Frontend**: HTML, CSS, JSP, JavaScript
-- **Backend**: Spring Boot, JPA, Spring Security
-- **Database**: MySQL
+LaptopShop la website ban laptop duoc xay dung bang Spring Boot MVC, JSP/JSTL va MySQL. Du an ho tro day du luong mua hang co ban cho khach hang, trang quan tri cho admin, goi y laptop bang AI, chat realtime voi admin va cac chuc nang ho tro sau ban hang.
 
-## Features
-- **User Role Management**: Supports different roles, including Admin and User.
-- **Guest Access**: Users can browse the homepage and view products without logging in. However, they must log in to add products to their cart.
-- **Shopping Cart Management**: Users can manage items in their cart.
-- **Order History Management**: Users can view their past orders.
-- **Admin Management**:
-  - **User Management**: View, edit, and delete users.
-  - **Product Management**: View, add, edit, and delete products.
-  - **Order Management**: View, edit, and delete orders.
-- **Data Pagination**: Efficiently displays large sets of data across multiple pages.
-- **Session Management**: Uses sessions to maintain user login state.
+## Cong nghe su dung
 
-## Overview
-This project was developed as part of the learning process for Java Spring MVC. The website provides core online shopping functionalities but currently lacks data filtering features.
+- Java 17
+- Spring Boot 3.2.2
+- Spring MVC, Spring Data JPA, Spring Security
+- Spring WebSocket
+- Spring Session JDBC
+- JSP, JSTL, Bootstrap, JavaScript
+- MySQL
+- OpenAI API cho tinh nang AI chat/goi y
+- Maven Wrapper
 
-## Images
-### Admin
+## Namespace du an
+
+Package chinh cua source code:
+
+```text
+datt.nguyenthanhlong.laptopshop
+```
+
+Metadata Maven:
+
+```xml
+<groupId>datt.nguyenthanhlong</groupId>
+<artifactId>laptopshop</artifactId>
+```
+
+## Chuc nang chinh
+
+### Khach hang
+
+- Dang ky, dang nhap, dang xuat va phan quyen tai khoan.
+- Xem trang chu, danh sach laptop va chi tiet san pham.
+- Tim kiem, loc va phan trang san pham.
+- Them san pham vao gio hang, cap nhat so luong va dat hang.
+- Xem lich su don hang va tien trinh xu ly don.
+- So sanh laptop.
+- Them san pham vao wishlist.
+- Danh gia san pham.
+- Gui yeu cau bao hanh.
+- Su dung voucher giam gia khi dat hang.
+- Tim laptop phu hop theo nhu cau qua trang AI finder.
+- Chat voi tro ly AI va lien he admin qua kenh chat realtime.
+
+### Quan tri vien
+
+- Dashboard tong quan doanh thu, don hang, san pham va nguoi dung.
+- Quan ly nguoi dung.
+- Quan ly san pham va upload anh san pham.
+- Quan ly don hang, cap nhat trang thai don va theo doi lich su trang thai.
+- Quan ly voucher giam gia.
+- Quan ly yeu cau bao hanh.
+- Theo doi va phan hoi tin nhan AI/chat cua khach hang.
+
+## Anh giao dien
+
+> Cap nhat cac anh trong thu muc `docs/screenshots` khi giao dien thay doi de README luon hien thi dung ban moi nhat.
+
+### Dang nhap
+
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/f79ab330-24f7-4b51-9a9a-560ec210d2af" alt="Admin Dashboard" width="45%">
-  <img src="https://github.com/user-attachments/assets/b0c9c9e4-834e-4cb2-ae5f-2c6a753be337" alt="Admin Manage User" width="45%">
-  <img src="https://github.com/user-attachments/assets/135c7a4d-8b72-415a-abb4-55642d4fdbf4" alt="Admin Manage Order" width="45%">
-  <img src="https://github.com/user-attachments/assets/e0603943-8151-4c7e-8d7f-401e986a4563" alt="Admin Manage Product" width="45%">
+  <img src="docs/screenshots/anh-dang-nhap.png" alt="Man hinh dang nhap" width="70%">
 </p>
 
-### User
+### Giao dien khach hang
+
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/833d7b7d-19da-4a24-9383-1a066c1fa1c6" alt="Login" width="45%">
-  <img src="https://github.com/user-attachments/assets/dada0e2b-3d48-49a3-8ecd-3e3056d95530" alt="User Homepage" width="45%">
-  <img src="https://github.com/user-attachments/assets/39eb0ff6-46ef-40ef-a70c-50bcee80f642" alt="User Homepage" width="45%">
-  <img src="https://github.com/user-attachments/assets/a48d326b-ae5f-499c-ba62-23eb1fc5c109" alt="User Shop Detail" width="45%">
-  <img src="https://github.com/user-attachments/assets/47ced320-8692-4ad8-b37a-ac46fe69e8be" alt="Shopping Cart" width="45%">
-  <img src="https://github.com/user-attachments/assets/6e898bbe-7f21-4c0d-8d06-60b4cb6bbafd" alt="Order History" width="45%">
+  <img src="docs/screenshots/man-khach-hang.png" alt="Man hinh khach hang" width="45%">
+  <img src="docs/screenshots/man-don-hang.png" alt="Lich su va trang thai don hang" width="45%">
 </p>
 
-### DataBase
+### Tinh nang AI va chat
+
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/19a8ca3d-c548-4a38-8886-3050e4be9b6a" alt="Login" width="45%">
+  <img src="docs/screenshots/chuc-nang-AI.png" alt="Tinh nang AI goi y laptop" width="45%">
+  <img src="docs/screenshots/man-chat-admin.png" alt="Man hinh chat voi admin" width="45%">
 </p>
+
+### Giao dien quan tri
+
+<p align="center">
+  <img src="docs/screenshots/man-admin.png" alt="Man hinh quan tri" width="70%">
+</p>
+
+### So do phan tich
+
+<p align="center">
+  <img src="docs/so-do-phan-ra-chuc-nang.svg" alt="So do phan ra chuc nang" width="70%">
+</p>
+
+## Cau truc thu muc
+
+```text
+src/main/java/datt/nguyenthanhlong/laptopshop
+├── config        # Cau hinh MVC, Security, WebSocket, filter, khoi tao du lieu
+├── controller    # Controller cho client, admin va error page
+├── domain        # Entity va DTO
+├── repository    # Spring Data JPA repository
+└── service       # Business logic, AI, upload, notification, order, product
+
+src/main/webapp
+├── WEB-INF/view  # JSP view cho client va admin
+└── resources     # CSS, JavaScript, image, library frontend
+```
+
+## Yeu cau moi truong
+
+- JDK 17 tro len
+- MySQL 8.x
+- Maven Wrapper co san trong du an (`mvnw`, `mvnw.cmd`)
+- OpenAI API key neu muon dung day du tinh nang AI
+
+## Cau hinh ung dung
+
+File cau hinh chinh nam tai:
+
+```text
+src/main/resources/application.properties
+```
+
+Mac dinh du an ket noi MySQL theo cau hinh:
+
+```properties
+spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:3306/laptopshop
+spring.datasource.username=root
+spring.datasource.password=123456
+spring.jpa.hibernate.ddl-auto=update
+```
+
+Neu can doi thong tin database, hay sua cac gia tri tren cho dung voi may cua ban.
+
+Bien moi truong cho AI:
+
+```text
+OPENAI_API_KEY=your_api_key
+OPENAI_MODEL=gpt-4.1
+```
+
+Neu khong cau hinh `OPENAI_API_KEY`, cac chuc nang goi API AI co the khong hoat dong day du.
+
+## Khoi tao database
+
+Tao database MySQL:
+
+```sql
+CREATE DATABASE laptopshop CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+Khi chay ung dung, Hibernate se tu dong cap nhat schema theo entity vi du an dang dung:
+
+```properties
+spring.jpa.hibernate.ddl-auto=update
+```
+
+Du an co lop khoi tao du lieu tai:
+
+```text
+src/main/java/datt/nguyenthanhlong/laptopshop/config/DataInitializer.java
+```
+
+## Cach chay du an
+
+Tren Windows:
+
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
+Tren macOS/Linux:
+
+```bash
+./mvnw spring-boot:run
+```
+
+Sau khi chay thanh cong, mo trinh duyet tai:
+
+```text
+http://localhost:8080
+```
+
+## Kiem thu va dong goi
+
+Chay test:
+
+```bash
+./mvnw test
+```
+
+Dong goi ung dung:
+
+```bash
+./mvnw clean package
+```
+
+File build se nam trong thu muc:
+
+```text
+target/
+```
+
+## Ghi chu khi phat trien
+
+- View JSP duoc dat trong `src/main/webapp/WEB-INF/view`.
+- Static resource duoc dat trong `src/main/webapp/resources`.
+- Anh san pham/avatar upload duoc luu trong cac thu muc con cua `src/main/webapp/resources/images`.
+- Session dang dung Spring Session JDBC, schema session se duoc khoi tao tu dong.
