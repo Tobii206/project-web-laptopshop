@@ -354,7 +354,45 @@
                                         <c:if test="${order.customerConfirmedReceived}">Khách đã nhận hàng</c:if>
                                         <c:if test="${!order.customerConfirmedReceived}">Khách chưa xác nhận nhận hàng</c:if>
                                         <c:if test="${order.returnRequested}">
-                                            <br>Đổi trả: ${order.returnStatus}
+                                            <br>${order.returnTypeLabel}: ${order.returnStatus}
+                                            <c:choose>
+                                                <c:when test="${order.exchangeRequested}">
+                                                    <c:if test="${not empty order.exchangeProduct}">
+                                                        <br>Sản phẩm đổi sang: ${order.exchangeProduct.name}
+                                                    </c:if>
+                                                    <br>Giá trị máy cũ tính 80%:
+                                                    <fmt:formatNumber type="number" value="${order.exchangeCreditAmount}" /> đ
+                                                    <c:if test="${order.exchangeNewProductPrice > 0}">
+                                                        <br>Giá máy mới:
+                                                        <fmt:formatNumber type="number" value="${order.exchangeNewProductPrice}" /> đ
+                                                        <c:choose>
+                                                            <c:when test="${order.exchangeAdditionalAmount > 0}">
+                                                                <br>Khách cần chuyển thêm:
+                                                                <fmt:formatNumber type="number" value="${order.exchangeAdditionalAmount}" /> đ
+                                                            </c:when>
+                                                            <c:when test="${order.exchangeRefundAmount > 0}">
+                                                                <br>Cần hoàn cho khách:
+                                                                <fmt:formatNumber type="number" value="${order.exchangeRefundAmount}" /> đ
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <br>Không phát sinh chênh lệch.
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </c:if>
+                                                    <c:if test="${order.exchangePaymentConfirmed}">
+                                                        <br>Đã xác nhận khách chuyển đủ tiền.
+                                                    </c:if>
+                                                    <c:if test="${order.exchangePaymentSubmitted and not order.exchangePaymentConfirmed}">
+                                                        <br>Khách đã báo chuyển khoản, chờ admin xác nhận.
+                                                    </c:if>
+                                                    <c:if test="${order.exchangeCompleted}">
+                                                        <br>Đã đổi máy mới cho khách hàng.
+                                                    </c:if>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <br>Đã hoàn lại 70% tiền cho khách hàng.
+                                                </c:otherwise>
+                                            </c:choose>
                                         </c:if>
                                         <c:if test="${order.warrantyCompleted}">
                                             <br>Bảo hành: Đã hoàn tất
@@ -450,7 +488,7 @@
                                                 <span class="timeline-dot"></span>
                                                 <div class="fw-bold">${history.actor}</div>
                                                 <div class="text-secondary">
-                                                    ${history.oldStatus} → ${history.newStatus}
+                                                    <c:choose>                                                         <c:when test="${history.oldStatus eq 'Hanh dong'}">                                                             ${history.newStatus}                                                         </c:when>                                                         <c:otherwise>                                                             ${history.oldStatus} -> ${history.newStatus}                                                         </c:otherwise>                                                     </c:choose>
                                                     <c:if test="${not empty history.note}"> · ${history.note}</c:if>
                                                 </div>
                                                 <div class="small text-muted">${fn:replace(history.createdAt, 'T', ' ')}</div>

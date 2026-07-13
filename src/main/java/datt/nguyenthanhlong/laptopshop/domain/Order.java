@@ -61,9 +61,27 @@ public class Order {
 
     private String returnStatus;
 
+    private String returnType;
+
     private LocalDateTime returnRequestedAt;
 
     private String returnReason;
+
+    @ManyToOne
+    @JoinColumn(name = "exchange_product_id")
+    private Product exchangeProduct;
+
+    private double exchangeNewProductPrice;
+
+    private double exchangeAdditionalAmount;
+
+    private double exchangeRefundAmount;
+
+    private boolean exchangePaymentConfirmed;
+
+    private boolean exchangePaymentSubmitted;
+
+    private boolean exchangeCompleted;
 
     private boolean warrantyCompleted;
 
@@ -273,6 +291,98 @@ public class Order {
         };
     }
 
+    public String getReturnType() {
+        return returnType;
+    }
+
+    public void setReturnType(String returnType) {
+        this.returnType = returnType;
+    }
+
+    public String getReturnTypeLabel() {
+        if ("EXCHANGE".equalsIgnoreCase(returnType)) {
+            return "Đổi hàng";
+        }
+        return "Trả hàng hoàn tiền";
+    }
+
+    public boolean isExchangeRequested() {
+        return "EXCHANGE".equalsIgnoreCase(returnType);
+    }
+
+    public boolean isRefundReturnRequested() {
+        return !isExchangeRequested();
+    }
+
+    public double getExchangeCreditAmount() {
+        return isExchangeRequested() ? totalPrice * 0.8 : 0;
+    }
+
+    public double getExchangeNewProductPrice() {
+        return exchangeNewProductPrice;
+    }
+
+    public void setExchangeNewProductPrice(double exchangeNewProductPrice) {
+        this.exchangeNewProductPrice = exchangeNewProductPrice;
+    }
+
+    public double getExchangeAdditionalAmount() {
+        return exchangeAdditionalAmount;
+    }
+
+    public void setExchangeAdditionalAmount(double exchangeAdditionalAmount) {
+        this.exchangeAdditionalAmount = exchangeAdditionalAmount;
+    }
+
+    public double getExchangeRefundAmount() {
+        return exchangeRefundAmount;
+    }
+
+    public void setExchangeRefundAmount(double exchangeRefundAmount) {
+        this.exchangeRefundAmount = exchangeRefundAmount;
+    }
+
+    public Product getExchangeProduct() {
+        return exchangeProduct;
+    }
+
+    public void setExchangeProduct(Product exchangeProduct) {
+        this.exchangeProduct = exchangeProduct;
+    }
+
+    public boolean isExchangePaymentConfirmed() {
+        return exchangePaymentConfirmed;
+    }
+
+    public void setExchangePaymentConfirmed(boolean exchangePaymentConfirmed) {
+        this.exchangePaymentConfirmed = exchangePaymentConfirmed;
+    }
+
+    public boolean isExchangePaymentSubmitted() {
+        return exchangePaymentSubmitted;
+    }
+
+    public void setExchangePaymentSubmitted(boolean exchangePaymentSubmitted) {
+        this.exchangePaymentSubmitted = exchangePaymentSubmitted;
+    }
+
+    public boolean isExchangeCompleted() {
+        return exchangeCompleted;
+    }
+
+    public void setExchangeCompleted(boolean exchangeCompleted) {
+        this.exchangeCompleted = exchangeCompleted;
+    }
+
+    public boolean isExchangeQrAvailable() {
+        return isExchangeRequested()
+                && exchangeAdditionalAmount > 0
+                && !exchangePaymentConfirmed
+                && !exchangeCompleted
+                && !"REJECTED".equalsIgnoreCase(returnStatus)
+                && !"COMPLETED".equalsIgnoreCase(returnStatus);
+    }
+
     public String getPaymentStatusLabel() {
         if (paymentStatus == null || paymentStatus.isBlank()) {
             return "Chưa xác định";
@@ -288,7 +398,8 @@ public class Order {
     }
 
     public boolean isLockedForAdminChanges() {
-        return customerConfirmedReceived || "COMPLETED".equalsIgnoreCase(returnStatus) || warrantyCompleted;
+        return (customerConfirmedReceived && !isExchangeRequested()) || "COMPLETED".equalsIgnoreCase(returnStatus) || exchangeCompleted
+                || warrantyCompleted;
     }
 
     public boolean isDeletableByAdmin() {

@@ -93,11 +93,82 @@
                                             </c:if>
                                             <c:if test="${order.returnRequested}">
                                                 <div class="mt-2">
-                                                    <span class="badge bg-warning text-dark">Đổi trả: ${order.returnStatusLabel}</span>
+                                                    <span class="badge bg-warning text-dark">${order.returnTypeLabel}: ${order.returnStatusLabel}</span>
                                                     <div class="small mt-1"><c:out value="${order.returnReason}" /></div>
                                                     <c:choose>
+                                                        <c:when test="${order.exchangeRequested}">
+                                                            <div class="small text-muted mt-1">
+                                                                Giá trị máy cũ được tính 80%:
+                                                                <strong><fmt:formatNumber type="number" value="${order.exchangeCreditAmount}" /> đ</strong>
+                                                            </div>
+                                                            <c:if test="${not empty order.exchangeProduct}">
+                                                                <div class="small text-muted">
+                                                                    Sản phẩm đổi sang:
+                                                                    <strong>${order.exchangeProduct.name}</strong>
+                                                                </div>
+                                                            </c:if>
+                                                            <c:if test="${order.exchangeNewProductPrice > 0}">
+                                                                <div class="small text-muted">
+                                                                    Giá máy mới:
+                                                                    <strong><fmt:formatNumber type="number" value="${order.exchangeNewProductPrice}" /> đ</strong>
+                                                                </div>
+                                                                <c:choose>
+                                                                    <c:when test="${order.exchangeAdditionalAmount > 0}">
+                                                                        <div class="small text-primary fw-bold">
+                                                                            Khách cần chuyển thêm:
+                                                                            <fmt:formatNumber type="number" value="${order.exchangeAdditionalAmount}" /> đ
+                                                                        </div>
+                                                                    </c:when>
+                                                                    <c:when test="${order.exchangeRefundAmount > 0}">
+                                                                        <div class="small text-success fw-bold">
+                                                                            Cần hoàn cho khách:
+                                                                            <fmt:formatNumber type="number" value="${order.exchangeRefundAmount}" /> đ
+                                                                        </div>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <div class="small text-success fw-bold">Không phát sinh chênh lệch.</div>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </c:if>
+                                                            <c:choose>
+                                                                <c:when test="${order.exchangeCompleted}">
+                                                                    <div class="small text-success mt-1">Đã đổi máy mới cho khách hàng.</div>
+                                                                </c:when>
+                                                                <c:when test="${order.exchangePaymentConfirmed}">
+                                                                    <div class="small text-success mt-1">Đã xác nhận khách chuyển đủ tiền.</div>
+                                                                    <div class="small text-muted mt-1">Hãy cập nhật đơn sang trạng thái đang giao hàng. Khi khách bấm đã nhận, đổi hàng sẽ hoàn tất.</div>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <c:choose>
+                                                                        <c:when test="${order.exchangeQrAvailable or order.exchangePaymentSubmitted}">
+                                                                            <c:choose>
+                                                                                <c:when test="${order.exchangePaymentSubmitted}">
+                                                                                    <form method="post" action="/admin/order/${order.id}/exchange-payment" class="mt-2">
+                                                                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                                                                        <button type="submit" class="btn btn-outline-success btn-sm">
+                                                                                            Xác nhận tiền đã chuyển
+                                                                                        </button>
+                                                                                    </form>
+                                                                                </c:when>
+                                                                                <c:otherwise>
+                                                                                    <div class="small text-muted mt-2">Chờ khách báo đã chuyển khoản.</div>
+                                                                                </c:otherwise>
+                                                                            </c:choose>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <div class="small text-muted mt-2">Không cần khách chuyển thêm. Hãy cập nhật đơn sang trạng thái đang giao hàng.</div>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <div class="small text-success mt-1">Đã hoàn lại 70% tiền cho khách hàng.</div>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                    <c:choose>
                                                         <c:when test="${order.returnStatus eq 'COMPLETED'}">
-                                                            <div class="small text-success mt-2">Đổi trả đã hoàn tất, đơn đã khóa.</div>
+                                                            <div class="small text-success mt-2">Yêu cầu đã hoàn tất, đơn đã khóa.</div>
                                                         </c:when>
                                                         <c:otherwise>
                                                             <form method="post" action="/admin/order/${order.id}/return-status" class="mt-2">

@@ -90,6 +90,12 @@ Metadata Maven:
   <img src="docs/so-do-phan-ra-chuc-nang.svg" alt="So do phan ra chuc nang" width="70%">
 </p>
 
+### ERD database
+
+<p align="center">
+  <img src="docs/screenshots/errd.png" alt="ERD database LaptopShop" width="70%">
+</p>
+
 ## Cau truc thu muc
 
 ```text

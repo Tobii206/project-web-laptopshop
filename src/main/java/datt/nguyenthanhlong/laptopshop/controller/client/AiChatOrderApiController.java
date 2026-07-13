@@ -80,15 +80,16 @@ public class AiChatOrderApiController {
     @PostMapping("/ai-chat/api/orders/{id}/return")
     @ResponseBody
     public Map<String, Object> requestReturn(@PathVariable long id,
+            @RequestParam(value = "returnType", defaultValue = "REFUND") String returnType,
             @RequestParam("reason") String reason,
             HttpServletRequest request) {
         User user = currentUser(request);
-        boolean success = this.orderService.requestReturn(id, user, reason);
+        boolean success = this.orderService.requestReturn(id, user, returnType, null, reason);
         return Map.of(
                 "success", success,
                 "message", success
-                        ? "Đã gửi yêu cầu đổi trả cho đơn #" + id + ". Admin sẽ kiểm tra và phản hồi."
-                        : "Chưa thể gửi yêu cầu đổi trả. Đơn hàng phải đã nhận và chưa có yêu cầu đổi trả.");
+                        ? "Đã gửi yêu cầu sau bán hàng cho đơn #" + id + ". Admin sẽ kiểm tra và phản hồi."
+                        : "Chưa thể gửi yêu cầu sau bán hàng. Đơn hàng phải đã nhận và chưa có yêu cầu trước đó.");
     }
 
     @PostMapping("/ai-chat/api/warranty/{orderDetailId}")

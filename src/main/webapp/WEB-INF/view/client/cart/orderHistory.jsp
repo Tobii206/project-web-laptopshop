@@ -330,9 +330,62 @@
                                     <span class="status-pill success">Đã nhận hàng</span>
                                 </c:if>
                                 <c:if test="${order.returnRequested}">
-                                    <span class="status-pill warning">Đổi trả: ${order.returnStatusLabel}</span>
+                                    <span class="status-pill warning">${order.returnTypeLabel}: ${order.returnStatusLabel}</span>
+                                </c:if>
+                                <c:if test="${order.exchangeCompleted}">
+                                    <span class="status-pill success">Đổi hàng thành công</span>
                                 </c:if>
                             </div>
+                            <c:if test="${order.returnRequested}">
+                                <c:choose>
+                                    <c:when test="${order.exchangeRequested}">
+                                        <c:if test="${not empty order.exchangeProduct}">
+                                            <div class="small text-muted mt-2">
+                                                Sản phẩm đổi sang:
+                                                <strong>${order.exchangeProduct.name}</strong>
+                                            </div>
+                                        </c:if>
+                                        <div class="small text-muted mt-2">
+                                            Giá trị máy cũ được tính 80%:
+                                            <strong><fmt:formatNumber type="number" value="${order.exchangeCreditAmount}" /> đ</strong>
+                                        </div>
+                                        <c:if test="${order.exchangeNewProductPrice > 0}">
+                                            <div class="small text-muted">
+                                                Giá máy mới:
+                                                <strong><fmt:formatNumber type="number" value="${order.exchangeNewProductPrice}" /> đ</strong>
+                                            </div>
+                                            <div class="small text-primary fw-bold">
+                                                Cần chuyển thêm:
+                                                <fmt:formatNumber type="number" value="${order.exchangeAdditionalAmount}" /> đ
+                                            </div>
+                                            <c:if test="${order.exchangeQrAvailable}">
+                                                <a class="btn btn-outline-primary btn-sm rounded-pill mt-2"
+                                                    href="/order-history/${order.id}/exchange-qr">
+                                                    Mở QR chuyển khoản
+                                                </a>
+                                            </c:if>
+                                            <c:if test="${order.exchangeRefundAmount > 0}">
+                                                <div class="small text-success fw-bold mt-1">
+                                                    Shop cần hoàn lại:
+                                                    <fmt:formatNumber type="number" value="${order.exchangeRefundAmount}" /> đ
+                                                </div>
+                                            </c:if>
+                                        </c:if>
+                                        <c:if test="${order.exchangePaymentConfirmed}">
+                                            <div class="small text-success fw-bold mt-2">Admin đã xác nhận đủ tiền đổi máy.</div>
+                                        </c:if>
+                                        <c:if test="${order.exchangePaymentSubmitted and not order.exchangePaymentConfirmed}">
+                                            <div class="small text-warning fw-bold mt-2">Đã báo chuyển khoản, chờ admin xác nhận.</div>
+                                        </c:if>
+                                        <c:if test="${order.exchangeCompleted}">
+                                            <div class="small text-success fw-bold mt-2">Đã đổi máy mới cho khách hàng.</div>
+                                        </c:if>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="small text-success fw-bold mt-2">Đã hoàn lại 70% tiền cho khách hàng.</div>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:if>
                             <div class="small mt-2 text-muted">
                                 Thanh toán: ${order.paymentMethod} - ${order.paymentStatusLabel}
                             </div>
@@ -419,6 +472,14 @@
                                 </c:if>
 
                                 <c:choose>
+                                    <c:when test="${order.exchangeRequested and order.exchangePaymentConfirmed and not order.exchangeCompleted and order.status eq 'SHIPPING'}">
+                                        <form method="post" action="/order-history/${order.id}/received" class="mb-3">
+                                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                            <button type="submit" class="btn btn-success btn-sm rounded-pill w-100">
+                                                Đã nhận máy đổi mới
+                                            </button>
+                                        </form>
+                                    </c:when>
                                     <c:when test="${not order.customerConfirmedReceived and order.status eq 'SHIPPING'}">
                                         <form method="post" action="/order-history/${order.id}/received" class="mb-3">
                                             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
@@ -441,17 +502,75 @@
                                     <c:when test="${order.customerConfirmedReceived and not order.returnRequested}">
                                         <form method="post" action="/order-history/${order.id}/return">
                                             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                            <select class="form-select form-select-sm mb-2 js-return-type" name="returnType" required>
+                                                <option value="REFUND">Trả hàng hoàn tiền</option>
+                                                <option value="EXCHANGE">Đổi hàng</option>
+                                            </select>
+                                            <div class="exchange-product-box d-none">
+                                                <select class="form-select form-select-sm mb-2" name="exchangeProductId">
+                                                    <option value="">Chọn sản phẩm cần đổi</option>
+                                                    <c:forEach var="product" items="${exchangeProducts}">
+                                                        <option value="${product.id}">
+                                                            ${product.name} -
+                                                            <fmt:formatNumber type="number" value="${product.price}" /> đ
+                                                        </option>
+                                                    </c:forEach>
+                                                </select>
+                                            </div>
                                             <textarea class="form-control form-control-sm mb-2" name="returnReason"
-                                                rows="3" placeholder="Lý do đổi/trả hàng" required></textarea>
+                                                rows="3" placeholder="Lý do yêu cầu" required></textarea>
                                             <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill w-100">
-                                                Yêu cầu đổi trả
+                                                Gửi yêu cầu sau bán hàng
                                             </button>
                                         </form>
                                     </c:when>
                                     <c:when test="${order.returnRequested}">
                                         <div class="small">
-                                            <strong>Lý do đổi trả:</strong>
+                                            <strong>${order.returnTypeLabel}:</strong>
                                             <div><c:out value="${order.returnReason}" /></div>
+                                            <c:choose>
+                                                <c:when test="${order.exchangeRequested}">
+                                                    <c:if test="${not empty order.exchangeProduct}">
+                                                        <div class="text-muted mt-2">
+                                                            Sản phẩm đổi sang: ${order.exchangeProduct.name}
+                                                        </div>
+                                                    </c:if>
+                                                    <div class="text-muted mt-2">
+                                                        80% giá trị máy cũ:
+                                                        <fmt:formatNumber type="number" value="${order.exchangeCreditAmount}" /> đ
+                                                    </div>
+                                                    <c:if test="${order.exchangeNewProductPrice > 0}">
+                                                        <div class="text-primary fw-bold mt-2">
+                                                            Cần chuyển thêm:
+                                                            <fmt:formatNumber type="number" value="${order.exchangeAdditionalAmount}" /> đ
+                                                        </div>
+                                                        <c:if test="${order.exchangeQrAvailable}">
+                                                            <a class="btn btn-outline-primary btn-sm rounded-pill mt-2"
+                                                                href="/order-history/${order.id}/exchange-qr">
+                                                                Mở QR chuyển khoản
+                                                            </a>
+                                                        </c:if>
+                                                        <c:if test="${order.exchangeRefundAmount > 0}">
+                                                            <div class="text-success fw-bold mt-2">
+                                                                Shop cần hoàn lại:
+                                                                <fmt:formatNumber type="number" value="${order.exchangeRefundAmount}" /> đ
+                                                            </div>
+                                                        </c:if>
+                                                    </c:if>
+                                                    <c:if test="${order.exchangePaymentConfirmed}">
+                                                        <div class="text-success fw-bold mt-2">Admin đã xác nhận đủ tiền đổi máy.</div>
+                                                    </c:if>
+                                                    <c:if test="${order.exchangePaymentSubmitted and not order.exchangePaymentConfirmed}">
+                                                        <div class="text-warning fw-bold mt-2">Đã báo chuyển khoản, chờ admin xác nhận.</div>
+                                                    </c:if>
+                                                    <c:if test="${order.exchangeCompleted}">
+                                                        <div class="text-success fw-bold mt-2">Đã đổi máy mới cho khách hàng.</div>
+                                                    </c:if>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="text-success fw-bold mt-2">Đã hoàn lại 70% tiền cho khách hàng.</div>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </div>
                                     </c:when>
                                 </c:choose>
@@ -485,6 +604,27 @@
     <script src="/lib/lightbox/js/lightbox.min.js"></script>
     <script src="/lib/owlcarousel/owl.carousel.min.js"></script>
     <script src="/js/main.js"></script>
+    <script>
+        document.querySelectorAll('.js-return-type').forEach(function (select) {
+            var form = select.closest('form');
+            var box = form.querySelector('.exchange-product-box');
+            var productSelect = box ? box.querySelector('select[name="exchangeProductId"]') : null;
+            var syncExchangeProduct = function () {
+                var isExchange = select.value === 'EXCHANGE';
+                if (box) {
+                    box.classList.toggle('d-none', !isExchange);
+                }
+                if (productSelect) {
+                    productSelect.required = isExchange;
+                    if (!isExchange) {
+                        productSelect.value = '';
+                    }
+                }
+            };
+            select.addEventListener('change', syncExchangeProduct);
+            syncExchangeProduct();
+        });
+    </script>
 </body>
 
 </html>

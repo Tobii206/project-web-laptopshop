@@ -13,23 +13,32 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import datt.nguyenthanhlong.laptopshop.domain.Order;
+import datt.nguyenthanhlong.laptopshop.domain.OrderDetail;
 import datt.nguyenthanhlong.laptopshop.domain.OrderStatusHistory;
+import datt.nguyenthanhlong.laptopshop.domain.Product;
 import datt.nguyenthanhlong.laptopshop.domain.User;
 import datt.nguyenthanhlong.laptopshop.domain.dto.OrderTimelineStepDTO;
+import datt.nguyenthanhlong.laptopshop.repository.OrderDetailRepository;
 import datt.nguyenthanhlong.laptopshop.repository.OrderRepository;
 import datt.nguyenthanhlong.laptopshop.repository.OrderStatusHistoryRepository;
+import datt.nguyenthanhlong.laptopshop.repository.ProductRepository;
 
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
     private final NotificationService notificationService;
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
+    private final ProductRepository productRepository;
+    private final OrderDetailRepository orderDetailRepository;
 
     public OrderService(OrderRepository orderRepository, NotificationService notificationService,
-            OrderStatusHistoryRepository orderStatusHistoryRepository) {
+            OrderStatusHistoryRepository orderStatusHistoryRepository, ProductRepository productRepository,
+            OrderDetailRepository orderDetailRepository) {
         this.orderRepository = orderRepository;
         this.notificationService = notificationService;
         this.orderStatusHistoryRepository = orderStatusHistoryRepository;
+        this.productRepository = productRepository;
+        this.orderDetailRepository = orderDetailRepository;
     }
 
     public List<Order> fetchOrders() {
@@ -38,6 +47,14 @@ public class OrderService {
 
     public Page<Order> fetchOrders(Pageable pageable) {
         return this.orderRepository.findAll(pageable);
+    }
+
+    public List<Order> fetchOrdersForAdminHistory() {
+        return this.orderRepository.findAllByOrderByCreatedAtDescIdDesc();
+    }
+
+    public List<Order> fetchOrdersForAdminHistoryByRange(LocalDateTime start, LocalDateTime end) {
+        return this.orderRepository.findByCreatedAtBetweenOrderByCreatedAtDescIdDesc(start, end);
     }
 
     public List<Order> fetchOrdersByUser(User user) {
@@ -52,7 +69,19 @@ public class OrderService {
         if (order == null) {
             return List.of();
         }
-        return this.orderStatusHistoryRepository.findByOrderOrderByCreatedAtDescIdDesc(order);
+        List<OrderStatusHistory> histories = new ArrayList<>(
+                this.orderStatusHistoryRepository.findByOrderOrderByCreatedAtDescIdDesc(order));
+        if (order.isReturnRequested() && histories.stream().noneMatch(this::isReturnHistory)) {
+            OrderStatusHistory returnHistory = new OrderStatusHistory();
+            returnHistory.setOrder(order);
+            returnHistory.setOldStatus("Doi tra");
+            returnHistory.setNewStatus(order.getReturnTypeLabel() + ": " + order.getReturnStatusLabel());
+            returnHistory.setActor("SYSTEM");
+            returnHistory.setNote("Trang thai doi tra hien tai");
+            returnHistory.setCreatedAt(order.getReturnRequestedAt());
+            histories.add(0, returnHistory);
+        }
+        return histories;
     }
 
     public Map<Long, List<OrderTimelineStepDTO>> buildTimelineMap(List<Order> orders) {
@@ -74,7 +103,10 @@ public class OrderService {
         Map<String, LocalDateTime> statusTimes = new HashMap<>();
         statusTimes.put("PENDING", order.getCreatedAt());
         for (OrderStatusHistory history : fetchStatusHistory(order)) {
-            statusTimes.put(normalizeStatus(history.getNewStatus()), history.getCreatedAt());
+            String normalizedHistoryStatus = normalizeStatus(history.getNewStatus());
+            if (isOrderFlowStatus(normalizedHistoryStatus)) {
+                statusTimes.put(normalizedHistoryStatus, history.getCreatedAt());
+            }
         }
         if (order.getReceivedAt() != null) {
             statusTimes.put("COMPLETE", order.getReceivedAt());
@@ -116,6 +148,21 @@ public class OrderService {
         if (order == null || user == null || order.getUser() == null || order.getUser().getId() != user.getId()) {
             return false;
         }
+        if (order.isExchangeRequested() && order.isExchangePaymentConfirmed() && !order.isExchangeCompleted()
+                && "SHIPPING".equalsIgnoreCase(order.getStatus())) {
+            order.setExchangeCompleted(true);
+            order.setReturnStatus("COMPLETED");
+            order.setStatus("COMPLETE");
+            addExchangeProductToOrderDetails(order);
+            this.orderRepository.save(order);
+            recordOrderAction(order, "CUSTOMER", "Khach xac nhan da nhan may doi moi",
+                    order.getExchangeProduct() == null ? "" : "Doi hang thanh cong: " + order.getExchangeProduct().getName());
+            recordStatusHistory(order, "SHIPPING", order.getStatus(), "CUSTOMER", "Khach da nhan may doi moi");
+            this.notificationService.notifyAdmins("Khach da nhan may doi moi",
+                    customerName(order) + " da xac nhan da nhan may doi moi cho don #" + order.getId(),
+                    adminOrderLink(order));
+            return true;
+        }
         if (order.isCustomerConfirmedReceived()) {
             return true;
         }
@@ -136,7 +183,7 @@ public class OrderService {
         return true;
     }
 
-    public boolean requestReturn(long orderId, User user, String reason) {
+    public boolean requestReturn(long orderId, User user, String returnType, Long exchangeProductId, String reason) {
         Order order = findOrderById(orderId);
         if (order == null || user == null || order.getUser() == null || order.getUser().getId() != user.getId()) {
             return false;
@@ -145,11 +192,34 @@ public class OrderService {
             return false;
         }
 
+        String normalizedReturnType = "EXCHANGE".equalsIgnoreCase(returnType) ? "EXCHANGE" : "REFUND";
+        Product exchangeProduct = null;
+        if ("EXCHANGE".equals(normalizedReturnType)) {
+            if (exchangeProductId == null) {
+                return false;
+            }
+            exchangeProduct = this.productRepository.findOneById(exchangeProductId);
+            if (exchangeProduct == null) {
+                return false;
+            }
+        }
         order.setReturnRequested(true);
+        order.setReturnType(normalizedReturnType);
         order.setReturnReason(reason == null ? "" : reason.trim());
         order.setReturnStatus("PENDING");
         order.setReturnRequestedAt(LocalDateTime.now());
+        if (exchangeProduct != null) {
+            applyExchangeProduct(order, exchangeProduct);
+        }
         this.orderRepository.save(order);
+        String action = order.isExchangeRequested() ? "Khach yeu cau doi hang" : "Khach yeu cau tra hang hoan tien";
+        recordOrderAction(order, "CUSTOMER", action, order.getReturnReason());
+        String title = order.isExchangeRequested() ? "Khach yeu cau doi hang" : "Khach yeu cau tra hang hoan tien";
+        String content = customerName(order) + " da gui yeu cau cho don #" + order.getId();
+        if (order.isExchangeRequested() && order.getExchangeProduct() != null) {
+            content += " - doi sang " + order.getExchangeProduct().getName();
+        }
+        this.notificationService.notifyAdmins(title, content, adminOrderLink(order));
         return true;
     }
 
@@ -218,15 +288,170 @@ public class OrderService {
             return false;
         }
 
-        order.setReturnStatus(returnStatus == null || returnStatus.isBlank() ? "PENDING" : returnStatus.trim());
+        String oldReturnStatus = order.getReturnStatus() == null || order.getReturnStatus().isBlank()
+                ? "PENDING"
+                : order.getReturnStatus().trim();
+        String normalizedReturnStatus = returnStatus == null || returnStatus.isBlank() ? "PENDING" : returnStatus.trim();
+        order.setReturnStatus(normalizedReturnStatus);
         this.orderRepository.save(order);
-        this.notificationService.notify(order.getUser(), "Yêu cầu đổi trả đã cập nhật",
-                "Đơn #" + order.getId() + " đổi trả: " + order.getReturnStatusLabel(), "/order-history");
+        recordReturnStatusHistory(order, oldReturnStatus, normalizedReturnStatus, "ADMIN",
+                order.getReturnStatusLabel());
+        this.notificationService.notify(order.getUser(), "Yêu cầu sau bán hàng đã cập nhật",
+                "Đơn #" + order.getId() + " " + order.getReturnTypeLabel().toLowerCase() + ": "
+                        + order.getReturnStatusLabel(),
+                "/order-history");
         return true;
+    }
+
+    public boolean confirmExchangePaymentFromAdmin(long orderId) {
+        Order order = findOrderById(orderId);
+        if (order == null || !order.isExchangeRequested() || isReturnCompleted(order)) {
+            return false;
+        }
+
+        order.setExchangePaymentConfirmed(true);
+        if (!"COMPLETED".equalsIgnoreCase(order.getReturnStatus())) {
+            order.setReturnStatus("APPROVED");
+        }
+        this.orderRepository.save(order);
+        recordOrderAction(order, "ADMIN", "Admin xac nhan du tien doi hang",
+                "Khach da chuyen du tien de doi may moi");
+        this.notificationService.notify(order.getUser(), "Đổi hàng đã xác nhận đủ tiền",
+                "Đơn #" + order.getId() + " đã được xác nhận đủ tiền để đổi máy mới.", "/order-history");
+        return true;
+    }
+
+    private void applyExchangeProduct(Order order, Product exchangeProduct) {
+        double newProductPrice = Math.max(exchangeProduct.getPrice(), 0);
+        double creditAmount = order.getExchangeCreditAmount();
+        order.setExchangeProduct(exchangeProduct);
+        order.setExchangeNewProductPrice(newProductPrice);
+        order.setExchangeAdditionalAmount(Math.max(newProductPrice - creditAmount, 0));
+        order.setExchangeRefundAmount(Math.max(creditAmount - newProductPrice, 0));
+        order.setExchangePaymentSubmitted(false);
+        order.setExchangePaymentConfirmed(order.getExchangeAdditionalAmount() <= 0);
+        order.setExchangeCompleted(false);
+    }
+
+    public boolean completeExchangeFromAdmin(long orderId) {
+        Order order = findOrderById(orderId);
+        if (order == null || !order.isExchangeRequested()
+                || order.isExchangeCompleted()
+                || (order.getExchangeAdditionalAmount() > 0 && !order.isExchangePaymentConfirmed())) {
+            return false;
+        }
+
+        if (order.getExchangeAdditionalAmount() <= 0) {
+            order.setExchangePaymentConfirmed(true);
+        }
+        order.setExchangeCompleted(true);
+        order.setReturnStatus("COMPLETED");
+        addExchangeProductToOrderDetails(order);
+        this.orderRepository.save(order);
+        recordOrderAction(order, "ADMIN", "Admin hoan tat doi hang",
+                order.getExchangeProduct() == null ? "" : "May moi: " + order.getExchangeProduct().getName());
+        this.notificationService.notify(order.getUser(), "Đổi hàng đã hoàn tất",
+                "Đơn #" + order.getId() + " đã được đổi máy mới cho khách hàng.", "/order-history");
+        return true;
+    }
+
+    public boolean markExchangePaymentSubmitted(long orderId, User user) {
+        Order order = findOrderById(orderId);
+        if (order == null || user == null || order.getUser() == null || order.getUser().getId() != user.getId()) {
+            return false;
+        }
+        if (!order.isExchangeRequested() || order.getExchangeAdditionalAmount() <= 0 || order.isExchangePaymentConfirmed()) {
+            return false;
+        }
+        order.setExchangePaymentSubmitted(true);
+        this.orderRepository.save(order);
+        recordOrderAction(order, "CUSTOMER", "Khach bao da chuyen tien doi hang",
+                Math.round(order.getExchangeAdditionalAmount()) + " d");
+        this.notificationService.notifyAdmins("Khách đã chuyển khoản đổi hàng",
+                "Đơn #" + order.getId() + " đã báo chuyển "
+                        + Math.round(order.getExchangeAdditionalAmount()) + " đ để đổi hàng.",
+                adminOrderLink(order));
+        return true;
+    }
+
+    private void addExchangeProductToOrderDetails(Order order) {
+        if (order == null || order.getExchangeProduct() == null) {
+            return;
+        }
+
+        Product exchangeProduct = order.getExchangeProduct();
+        OrderDetail existingDetail = this.orderDetailRepository.findByOrderAndProduct(order, exchangeProduct);
+        if (existingDetail != null) {
+            return;
+        }
+
+        OrderDetail orderDetail = new OrderDetail();
+        orderDetail.setOrder(order);
+        orderDetail.setProduct(exchangeProduct);
+        orderDetail.setQuantity(1);
+        double exchangePrice = order.getExchangeNewProductPrice() > 0
+                ? order.getExchangeNewProductPrice()
+                : exchangeProduct.getPrice();
+        orderDetail.setPrice(exchangePrice);
+        this.orderDetailRepository.save(orderDetail);
     }
 
     private boolean isReturnCompleted(Order order) {
         return order != null && "COMPLETED".equalsIgnoreCase(order.getReturnStatus());
+    }
+
+    private boolean isReturnHistory(OrderStatusHistory history) {
+        if (history == null || history.getOldStatus() == null) {
+            return false;
+        }
+        return history.getOldStatus().startsWith("Doi tra")
+                || history.getOldStatus().startsWith("Tra hang")
+                || history.getOldStatus().startsWith("Doi hang")
+                || "Hanh dong".equals(history.getOldStatus());
+    }
+
+    private void recordReturnStatusHistory(Order order, String oldStatus, String newStatus, String actor, String note) {
+        if (order == null || newStatus == null || newStatus.equals(oldStatus)) {
+            return;
+        }
+        OrderStatusHistory history = new OrderStatusHistory();
+        history.setOrder(order);
+        history.setOldStatus("Doi tra: " + oldStatus);
+        history.setNewStatus(newStatus);
+        history.setActor(actor);
+        history.setNote(note == null ? "" : note);
+        this.orderStatusHistoryRepository.save(history);
+    }
+
+    private void recordOrderAction(Order order, String actor, String action, String note) {
+        if (order == null || action == null || action.isBlank()) {
+            return;
+        }
+        OrderStatusHistory history = new OrderStatusHistory();
+        history.setOrder(order);
+        history.setOldStatus("Hanh dong");
+        history.setNewStatus(action);
+        history.setActor(actor);
+        history.setNote(note == null ? "" : note);
+        this.orderStatusHistoryRepository.save(history);
+    }
+
+    private String customerName(Order order) {
+        if (order == null || order.getUser() == null) {
+            return "Khach hang";
+        }
+        String fullName = order.getUser().getFullName();
+        if (fullName == null || fullName.isBlank()) {
+            return "Khach hang #" + order.getUser().getId();
+        }
+        return fullName;
+    }
+
+    private String adminOrderLink(Order order) {
+        if (order == null) {
+            return "/admin/order";
+        }
+        return "/admin/order/" + order.getId();
     }
 
     public boolean markQrPaymentSubmitted(long orderId, User user) {
@@ -307,6 +532,13 @@ public class OrderService {
             case "COMPLETE" -> 3;
             case "CANCEL" -> 0;
             default -> 0;
+        };
+    }
+
+    private boolean isOrderFlowStatus(String status) {
+        return switch (normalizeStatus(status)) {
+            case "PENDING", "CONFIRM", "SHIPPING", "COMPLETE", "CANCEL" -> true;
+            default -> false;
         };
     }
 

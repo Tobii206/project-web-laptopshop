@@ -14,6 +14,8 @@ import datt.nguyenthanhlong.laptopshop.domain.User;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findAll(Pageable pageable);
+    List<Order> findAllByOrderByCreatedAtDescIdDesc();
+    List<Order> findByCreatedAtBetweenOrderByCreatedAtDescIdDesc(LocalDateTime start, LocalDateTime end);
     List<Order> findByUserOrderByCreatedAtDescIdDesc(User user);
     List<Order> findByUserAndCreatedAtBetweenOrderByCreatedAtDescIdDesc(User user, LocalDateTime start, LocalDateTime end);
 }
